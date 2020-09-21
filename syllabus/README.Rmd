@@ -1,7 +1,7 @@
 ---
 title: 'OPER 655 - Text Mining'
 author: '<h3>Course Syllabus - Fall 2020</h3>'
-date: '<h3>TF 1500-1700 Bldg. 646 Rm. 214 (4.0 Credit Hours)</h3>'
+date: '<h3>TF 0800-0940 Bldg. 641 Rm. 220 (4.0 Credit Hours)</h3>'
 output: github_document
 ---
 

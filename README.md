@@ -7,7 +7,7 @@ Course Syllabus - Fall 2020
 </h3>
 <h3>
 
-TF 1500-1700 Bldg. 646 Rm. 214 (4.0 Credit Hours)
+TF 0800-0940 Bldg. 641 Rm. 220 (4.0 Credit Hours)
 
 </h3>
 

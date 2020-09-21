@@ -1,0 +1,14 @@
+base
+stringr
+pdftools
+XML
+here
+countrycode
+tibble
+qdapDictionaries
+qdapRegex
+qdapTools
+RColorBrewer
+qdap
+RVerbalExpressions
+DT

@@ -66,7 +66,7 @@ In R, we can extract the text from this file using the `readLines()` function as
 
 ```{r}
 oper655_readme_url <- 
-  "https://raw.githubusercontent.com/AFIT-R/oper655_fa2019/master/README.md"
+  "https://raw.githubusercontent.com/AFIT-DSL/oper655_fa2020/master/README.md"
 
 oper_readme_text <- readLines(oper655_readme_url)
 
@@ -79,37 +79,37 @@ Looking at the structure and first six elements of the character vector `oper_re
 
 ```{r}
 # Incorrectly interpreted curly quotes
-oper_readme_text[136]
+oper_readme_text[137]
 
 # Incorrecly interpreted elipsis ...
-oper_readme_text[251]
+oper_readme_text[252]
 
 # Incorrecly interpreted curly apostrophe
-oper_readme_text[264]
+oper_readme_text[265]
 ```
 
-These issues result because the file was saved using a different type of <a target=" " href="https://www.w3.org/International/articles/definitions-characters/">**encoding**</a> that the reading tool used to extract the content.  In this case the original markdown document was saved using a **UTF-8** encoding, while the default assumption for the `readLines()` function was that the data would be saved using a **Unicode** encoding. In this case, we can rectify the problem by specifying the encoding used by `readLines()` to match that of the original document. Looking at the elements of the character vector that had previously contained undesireable Unicode structures reveals that specifying the correct encoding results in the extracted text looking as expected.
+These issues result because the file was saved using a different type of <a target=" " href="https://www.w3.org/International/articles/definitions-characters/">**encoding**</a> than was expected by the tool used to extract the content.  In this case the original markdown document was saved using a **UTF-8** encoding, while the default assumption for the `readLines()` function was that the data would be saved using a **Unicode** encoding. In this case, we can rectify the problem by specifying the encoding used by `readLines()` to match that of the original document. Looking at the elements of the character vector that had previously contained undesirable Unicode structures reveals that specifying the correct encoding results in the extracted text looking as expected.
 
 ```{r}
 oper_readme_text <- readLines(oper655_readme_url, encoding = "UTF-8")
 
 # Correcly interpreted curly quotes
-oper_readme_text[136]
+oper_readme_text[137]
 
 # Correcly interpreted elipsis ...
-oper_readme_text[251]
+oper_readme_text[252]
 
 # Correcly interpreted curly apostrophe
-oper_readme_text[264]
+oper_readme_text[265]
 ```
 
-It's important to be aware of the encoding used to store text data is a document.  Using the wrong encoding could force you to perform a number of unnecessary and time-consuming tasks down the road.  Of course there are situations in which you are receiving the data "second-hand" and you're therefore unable to avoid the errors.  Or it may be that the document from which you are extracting uses symbols to denote sections or to make the document look "prettier".  In these cases, we must rely of regular expressions (aka regex) to remove and/or replace these symbols.  Regular expressions will be discussed in a future lecture.
+It's important to be aware of the encoding used to store text data in a document.  Using the wrong encoding could force you to perform a number of unnecessary and time-consuming tasks down the road.  Of course there are situations in which you are receiving the data "second-hand" and you're therefore unable to avoid the errors.  Or it may be that the document from which you are extracting uses symbols to denote sections or to make the document look "prettier".  In these cases, we must rely of regular expressions (aka regex) to remove and/or replace these symbols.  Regular expressions will be discussed in a future lecture.
 
 ## Extracting text from `csv`/`xls`/`xlsx` files
 
-In some cases text data is only a portion of a larger dataset.  Examples of this include survey data, customer review data, or data extracted from Twitter.  These data are usually stored in a spreadsheet format where the text data is contained in one column.
+In some cases text data is only a portion of a larger data set.  Examples of this include survey data, customer review data, or data extracted from Twitter.  These data are usually stored in a spreadsheet format where the text data is contained in one column.
 
-In this section, we'll demonstrate various methods to extract text data from spreadsheet documents -- specifically those in which the data have been stored as comma separated values (CSV).  We'll focus CSV files becaues they are commonly used to store and share spreadsheet data and because once we understand how to extract data from a CSV it's trivial to extend our workflow to XLS and XLSX documents.  The specific data we'll use are the <a target=" " href="https://www.kaggle.com/datafiniti/consumer-reviews-of-amazon-products">**Consumer Reviews of Amazon Products**</a> dataset made available by Datafiniti and posted to Kaggle.  The full dataset is spread across three CSV files, for this demonstration we'll focus on the `1429_1.csv` file. In this case, the file has already been downloaded and made a part of this repository. The location of the file, relative to the root of this repository, is assigned using the following code.
+In this section, we'll demonstrate various methods to extract text data from spreadsheet documents -- specifically those in which the data have been stored as comma separated values (CSV).  We'll focus on CSV files because they are commonly used to store and share spreadsheet data and because once we understand how to extract data from a CSV it's trivial to extend our workflow to XLS and XLSX documents.  The specific data we'll use are the <a target=" " href="https://www.kaggle.com/datafiniti/consumer-reviews-of-amazon-products">**Consumer Reviews of Amazon Products**</a> data set made available by Datafiniti and posted to Kaggle.  The full data set is spread across three CSV files, for this demonstration we'll focus on the `1429_1.csv` file. In this case, the file has already been downloaded and made a part of this repository. The location of the file, relative to the root of this repository, is assigned using the following code.
 
 ```{r}
 root <- rprojroot::find_root(rprojroot::is_rstudio_project)
@@ -117,7 +117,7 @@ root <- rprojroot::find_root(rprojroot::is_rstudio_project)
 (amazon_review_file <- file.path(root, "data","csv", "1429_1.csv"))
 ```
 
-We can review information about this specific file from <a target=" " href="https://www.kaggle.com/datafiniti/consumer-reviews-of-amazon-products#1429_1.csv">**this site**</a> on Kaggle. On the site we see that the size of this file is `r round(file.info(amazon_review_file)$size / 1024^2,digits = 2)` MB  and the dataset within the file has 20 columns.  The site does not indicate how may rows are in the dataset, but we can determine this after reading in the data.
+We can review information about this specific file from <a target=" " href="https://www.kaggle.com/datafiniti/consumer-reviews-of-amazon-products#1429_1.csv">**this site**</a> on Kaggle. On the site we see that the size of this file is `r round(file.info(amazon_review_file)$size / 1024^2,digits = 2)` MB  and the data set within the file has 20 columns.  The site does not indicate how may rows are in the data set, but we can determine this after reading in the data.
 
 There are at least four packages that contain functions which can be used for loading data from this CSV file.  The main reasons why anyone should choose one function from another are (1) the speed at which the data can be extracted, (2) the memory required to store the object after extraction, and (2) the class of the object created as result of the extraction.  I'll illustrate each of these function in turn, outlining some of the key differences.
 
@@ -133,7 +133,7 @@ time1 <- system.time({ amazon_review_data_1 <- read.csv(amazon_review_file) })
 - **Execution time:** `r time1[[3]]` seconds
 - **Memory required:** `r round(object.size(amazon_review_data_1) / 1024^2, digits=2)` MB
 - **Object class:** `r class(amazon_review_data_1)`
-- **Notes:** `read.csv` hass the slowest execution time of the four functions, but also results the smallest object size.  The only reason this function is used more often than the others is because it is the oldest and comes preinstalled with R as part of the `utils` package.  Another **very** important note is how `read.csv` treats strings.  Let's look at the structure of the `reviews.text` column (the column that contains the actual review).
+- **Notes:** `read.csv` has the slowest execution time of the four functions, but also results the smallest object size.  The only reason this function is used more often than the others is because it is the oldest and comes pre-installed with R as part of the `utils` package.  Another **very** important note is how `read.csv` treats strings.  Let's look at the structure of the `reviews.text` column (the column that contains the actual review).
 
 ```{r}
 str(amazon_review_data_1$reviews.text)
@@ -179,7 +179,7 @@ time4 <- system.time({ amazon_review_data_4 <- vroom::vroom(amazon_review_file) 
 
 ## Extracting text `.doc/.docx`..from MS^&#174;^ Word documents
 
-Once again, we need to download the Word files from the web, which can be done using the code below. <u>**Again, do not run this code as it is written in the LOGM655 project - it will overwrite the existing files.  I'll show you what to change**</u>
+Once again, we need to download the Word files from the web, which can be done using the code below. <u>**Again, do not run this code as it is written in the OPER655 project - it will overwrite the existing files.  I'll show you what to change**</u>
 
 ```{r, eval=FALSE}
 # Assign the URL to a text string
@@ -191,7 +191,7 @@ url_root  <- 'http://hhoppe.com/'
 # Before going forward you should change
 # these values to a location on your machine
 proj_root   <- find_root(is_rstudio_project)
-save_folder <- file.path(proj_root,'raw_data_files','msword_document_examples')
+save_folder <- file.path(proj_root,'data','word')
 
 # Extract html/xml content from URL
 rcurl.doc <- RCurl::getURL(url,
@@ -240,7 +240,7 @@ The `qdapTools` package is a collection of tools associated with the `qdap` pack
 Within the `qdapTools` package is the `read_docx()` function that is used for (you'll never guess) reading `.docx` files.  First, let's list the files like we did for the PDF files before.
 
 ```{r}
-dest <- file.path(root, 'data', 'msword')
+dest <- file.path(root, 'data', 'word')
 
 # make a vector of MS Word file names
 (ms_files <- list.files(path = dest,
@@ -259,16 +259,17 @@ Here we see that this function extracts the text as paragraphs, rather than as l
 
 ### Using the `antiword` package
 
-If you are working with Word documents that were saved using the older `.doc` format the `antiword` package is useful for extracting text data from such files.  Note that `antiword` will not extract data from `.docx` files as the newer standard utilizes Java code which `antiword` is unable to parse.
+If you are working with Word documents that were saved using the older `.doc` format the `antiword` package is useful for extracting text data from such files.  Note that `antiword` will not extract data from `.docx` files as the newer standard utilizes XML code which `antiword` is unable to parse.
 
 ## Extracting text from PDF documents
 
-The portable document format is often used to store text, expecially among government organizations. In this section we'll walk through the process of extracting text from the 2017 United States Supreme Court Opinions.  These documents can be accessed from [**this site**](https://www.supremecourt.gov/opinions/slipopinion/17).  In total, there are 85 documents in this corpus.  We could download and extract the text from each of these documents separately, but instead let's have R do this for us.
+The portable document format is often used to store text, especially among government organizations. In this section we'll walk through the process of extracting text from the 2017 United States Supreme Court Opinions.  These documents can be accessed from [**this site**](https://www.supremecourt.gov/opinions/slipopinion/17).  In total, there are 85 documents in this corpus.  We could download and extract the text from each of these documents separately, but instead let's have R do this for us.
 
 `supreme_court_opinions_2017_sample` folder, note that all of these files are saved using the PDF format.
+
 ### Saving local copies of the documents
 
-With these packages installed, we can now download the documents from the url using the code shown below.  <u>**However, do not run this code as it is written in the LOGM655 project - it will overwrite the existing files.  I'll show you what to change**</u>
+With these packages installed, we can now download the documents from the URL using the code shown below.  <u>**However, do not run this code as it is written in the LOGM655 project - it will overwrite the existing files.  I'll show you what to change**</u>
 
 ```{r, eval=FALSE}
 # Assign the URL to a text string
@@ -280,7 +281,7 @@ url_root  <- 'https://www.supremecourt.gov'
 # Before going forward you should change
 # these values to a location on your machine
 proj_root   <- rprojroot::find_root(is_rstudio_project)
-save_folder <- base::file.path(proj_root,'raw_data_files','supreme_court_opinions_2017')
+save_folder <- base::file.path(proj_root,'data','pdf')
 
 # Extract html/xml content from URL
 rcurl.doc <- RCurl::getURL(url,

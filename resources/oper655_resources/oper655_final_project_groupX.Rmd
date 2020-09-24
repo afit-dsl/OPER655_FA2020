@@ -1,0 +1,101 @@
+---
+title: "OPER 655: Text Mining"
+subtitle: "{enter text mining goal}: Final Project"
+author: "{enter student name} "
+date: '`r format(Sys.Date(), "%d %b %Y")`'
+output: 
+  html_document:
+    fig_caption: yes
+graphics: yes
+abstract: "This is the abstract"
+---
+
+# Introduction
+
+```{css, echo=F}
+div.plotly.html-widget {width: 800px;
+                   height: 800px;
+                   margin-left:auto;
+                   margin-right:auto;}
+```
+
+```{r load_resources, echo=FALSE}
+knitr::opts_chunk$set(echo = !FALSE, 
+                      fig.align = 'center',
+                      message = F,
+                      comment = ">>>",
+                      warning = F)
+```
+
+```{r load_packages, echo=FALSE}
+## put library() calls here for R packages
+library(knitr)
+
+## reticulate creates a connection between R and Python
+library(reticulate)
+
+
+## shouldn't need to uncomment the line below
+## but if you have trouble importing python libraries
+## you can specify which version of Python to use
+#-----------------------------------------------------
+#reticulate::use_python("C:/Path/to/my/python.exe")
+```
+
+```{python load_libraries, echo=FALSE}
+## import python libraries here
+## Note that reticulate, by default, looks for 
+## libraries in a python environment called r-reticulate
+##
+## also, you must run the previous chunk first to connect R to
+## the r-reticulate environment
+import pandas as pd
+import numpy as np
+```
+
+
+## Two hashtags creates a new sub-section
+
+- Main level bullet content here
+
+    + second level bullet content here as an unordered list
+    + second level bullet content here as an unordered list
+    + second level bullet content here as an unordered list
+
+- Here's an R code chunk
+
+```{r cars}
+summary(cars)
+```
+
+```{python}
+## convert r object `cars` to a python object
+## R data.frame objects automatically converted to a 
+## Python pandas DataFrame object  
+py_cars = r.cars
+
+type(py_cars)
+
+py_cars.head()
+```
+
+## New Section on same slide
+
+- Main level bullet content here
+
+    1. second level bullet content here as an ordered list
+    1. second level bullet content here as an ordered list
+    1. second level bullet content here as an ordered list
+
+# One hashtag creates a section
+
+## Slide should begin with a section heading 
+
+- Content on slide 2
+
+```{r pressure, echo=FALSE, fig.cap="A figure caption"}
+plot(pressure)
+```
+
+
+

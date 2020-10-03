@@ -1,0 +1,191 @@
+---
+title: "OPER 655: Text Mining"
+subtitle: "Final Project Report: { enter project title }"
+author: "{ enter student name }"
+date: '`r format(Sys.Date(), "%d %b %Y")`'
+output: 
+  bookdown::html_document2:
+    fig_caption: yes
+graphics: yes
+bibliography: ["resources/bib/oper655.bib"]
+link-citations: true
+abstract: |
+ "{ enter a one paragraph abstract }"
+---
+
+```{css style_rules, echo=F}
+div.plotly.html-widget {width: 800px;
+                   height: 800px;
+                   margin-left:auto;
+                   margin-right:auto;}
+
+div.abstract { text-align: center;}
+
+p  { font-size: 16px; }
+h2 { font-size: 24px; }
+h1 { font-size: 32px; }
+
+ol li { font-size: 16px; }
+ul li { font-size: 16px; }
+
+a { font-weight: bold; }
+```
+
+```{r load_resources, echo=FALSE}
+knitr::opts_chunk$set(echo = !FALSE, 
+                      fig.align = 'center',
+                      message = F,
+                      comment = ">>>",
+                      warning = F)
+```
+
+```{r load_packages, echo=FALSE}
+## put library() calls here for R packages
+library(knitr)
+
+## reticulate creates a connection between R and Python
+library(reticulate)
+
+
+## shouldn't need to uncomment the line below
+## but if you have trouble importing python libraries
+## you can specify which version of Python to use
+#-----------------------------------------------------
+#reticulate::use_python("C:/Path/to/my/python.exe")
+```
+
+```{python load_libraries, echo=FALSE}
+## import python libraries here
+## Note that reticulate, by default, looks for 
+## libraries in a python environment called r-reticulate
+##
+## also, you must run the previous chunk first to connect R to
+## the r-reticulate environment
+import pandas as pd
+import numpy as np
+```
+
+# Background
+
+The purpose of this template is to show you how to use the features of the `bookdown` package to create HTML documents. Once your comfortable with how to replicate these features yourself you can delete part or all of the content contained here. 
+
+This is a paragraph of content to include in your report - paragraphs do not begin with a bullet character (i.e. -,*,+).  Since this is an HTML document you can use HTML tags to style your text
+
+## Lists
+
+A bulleted list may be created in two flavors: unordered and ordered
+
+### Unordered list
+
+Unordered lists are not numbered
+
+- Main level bullet content here
+
+    + second level bullet content here as an unordered list
+    + second level bullet content here as an unordered list
+    + second level bullet content here as an unordered list
+
+If this were done in HTML it would look like this
+
+<ul>
+  <li>Main level bullet content here</li>
+  <ul>
+    <li>second level bullet content here as an unordered list</li>
+    <li>second level bullet content here as an unordered list</li>
+    <li>second level bullet content here as an unordered list</li>
+  </ul>
+</ul>
+
+### Ordered List
+
+Ordered list are numbered.  Note that for RMarkdown the numbers for each list item don't matter
+
+- Main level bullet content here
+
+    1. second level bullet content here as an ordered list
+    1. second level bullet content here as an ordered list
+    1. second level bullet content here as an ordered list
+
+<ul>
+  <li>Main level bullet content here</li>
+  <ol>
+    <li>second level bullet content here as an unordered list</li>
+    <li>second level bullet content here as an unordered list</li>
+    <li>second level bullet content here as an unordered list</li>
+  </ol>
+</ul>
+
+## Code Chunks
+
+Here's an R code chunk
+
+```{r cars}
+summary(cars)
+```
+
+Now we convert the R object `cars` to a Python object using a Python code chunk.  R `data.frame`-class objects are automatically converted to a Python `pandas. DataFrame`-class objects 
+
+```{python}
+py_cars = r.cars
+
+type(py_cars)
+
+py_cars.head()
+```
+
+And we can send Python objects back to R using the list `py` created by the `reticulate` package to store all objects created by Python.
+
+```{r}
+r_cars = py$py_cars
+
+head(r_cars)
+```
+
+## Creating and referencing objects
+
+### Creating and referencing plots
+
+Here we create a plot of the data set `pressure` that come pre-installed with the R language.  Note that using the chunk option `fig.cap` provides a caption for the figure.
+
+```{r pressure-plot, echo=FALSE, fig.cap="A figure caption"}
+plot(pressure)
+```
+
+We can then reference the plot by using the chunk name - in this case `pressure-plot`.  The figure may then be cross-referenced as Figure \@ref(fig:pressure-plot) throughout the document.
+
+### Creating and referencing tables
+
+Here we create a table showing the data set `pressure` that comes pre-installed with the R language.  Note that for tables we use the caption argument in the function used to create the table - in this case the `kable` function from the `knitr` package using the chunk option `fig.cap` provides a caption for the table.
+
+```{r pressure-table, echo=FALSE}
+knitr::kable(pressure, caption = "Table showing the pressure data set")
+```
+
+We can then reference the table by using the chunk name - in this case `pressure-table`.  The table may then be cross-referenced as Table \@ref(tab:pressure-table) throughout the document.
+
+## Creating and referencing equations
+
+Here we create a display equation.  Equations are created using <a target=" " href="https://www.mathjax.org/">MathJax</a> JavaScript engine.  MathJax  which has the same syntax as the \LaTeX package `amsmath`. We create an equation reference using the `(\#eq:eqn-name)` syntax.
+
+$$
+\begin{equation} 
+  f\left(k\right) = \binom{n}{k} p^k\left(1-p\right)^{n-k}
+  (\#eq:binom)
+\end{equation} 
+$$
+
+We can then reference the equation by using the equation name - in this case `eq:binom`.  The equation may then be cross-referenced as Equation \@ref(eq:binom) throughout the document.
+
+### Creating and Referencing Citations
+
+The process of creating and referencing citations is similar to how this is done in \LaTeX.  I have created a bibtex file to which you can add BibEntry elements.  If you look at the YAML header at the top of this document you'll see where to find this file.  All BibEntry elements have a key, a reference can be cited in your document using this `@key` syntax.  Thus, for the reference in the bib file with the key `R-base` We can cite this reference throughout the document using [@R-base].  Citing a reference automatically puts it into a list of references to be inlcuded in your bibliography - if one is created. 
+
+## Where to learn more?
+
+You can learn more about the options available by visiting the bookdown site <a target=" " href="https://bookdown.org/yihui/bookdown/">https://bookdown.org/yihui/bookdown/</a>
+
+# Methodology
+
+# Findings and Conclusions
+
+`r if (knitr::is_html_output()) '# References {-}'`

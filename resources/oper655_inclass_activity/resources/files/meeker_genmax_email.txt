@@ -1,0 +1,22 @@
+Bill,
+
+Attached is a zip archive containing the new R package that uses only C++ code and contains no FORTRAN. For now, I'm calling this package `SMRD2` to ensure that this package doesn't overwrite the existing SMRD package in your library.
+
+You shouldn't have any issues installing this on a Windows machine, but I haven't tried installing on a Mac/Linux/Unix machine yet - if you try it please let me know if you encounter any errors. (I remember a while back you mentioned wanting to install the package on a Linux machine).  Also, note that the initial installation will take a while as the C++ compiler is not as fast as gfortran.  From the end-user perspective there shouldn't be any difference in how this is used, although there are a few optimizations that I still need to do to make this run faster (specifically on the mlsim* subroutines).
+
+To date, all of the subroutines have been converted and all of them (EXCEPT GENMAX) return values that are at least within 1E-6 of the values returned by their FORTRAN counterparts.  I've run several tests on each subroutine, but these tests aren't exhaustive I created a directory in the package `inst/other_stuff/cpp_tests` that includes R code to test each of the top level cpp entry points. and compare the values return with those returned by the FORTRAN in SMRD. If you run your own tests and find values that are significantly different, please let me know.  The only caveats to this are the MLSIM* subroutines -- as these are supposed to return different values for each simulation.  For these subroutines the test I created compares the plots of the bootstrap samples and the results look similar. 
+
+Regarding GENMAX, I'm obviously still working on this.  The function executes without crashing but the results are incorrect.  One issue that I'm encountering is understanding what the subroutine `xerr` is supposed to be doing. I see that in the body of `xerr` there is a call `sysabt` which seems to abort execution.  However, looking at the dump files created by setting `kprint` to something other that zero shows that when `xerr` is invoked a call to `sysabt` is made and a statement is printed to the dump file which says "still aborting", however program execution continues.  Because of this, I interpreted calls to `xerr` to be warnings rather than as errors. Speaking of debugging dump files, you can used the kprint argument the same way you had used it in the FORTRAN version - the only difference is that the dump prints to the screen rather than to a file.  However, the dump can easily be printed to a file using `capture.output()`
+
+Finally, there are a few issues early I've found that still need to be addressed:
+
+1. Within the collection of subroutines that comprise `WQMCDFEST` there's an issue in both the C++ and the FORTRAN versions wherein for certain datasets (for example `turbine` and `devicen`) the generalized Kaplan-Meier fails and execution moves on the Turnbull algorithm.  When this occurs, something is causing the values of the standard errors of the CDF to be computed incorrectly. For the turbine example, these values are larger than 200.  I haven't had a chance to run this to ground but will look at it in early June.
+
+2. In the `alloyc` dataset it appears that the values in the are incorrect. Specifically, I believe that the `3's` values indicating left censoring should be `4's` indicating interval censoring.
+
+3. Similar to the `alloyc` dataset, in the `hcfdata` dataset it appears that the `0's` in the event column should be `2's` indicating right censoring.
+
+If you run into any other problems, please let me know. 
+  
+
+On this point I wanted to ask about how the arithmetic if statements work in FORTRAN. In the subroutine `wqm_powsss` you are comparing real*8 variables to zero, but do you know what level of precision this is using?  In the C++ version I compare values to 1e-40 to ensure accurate results, but it takes much longer to 
